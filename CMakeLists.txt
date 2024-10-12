@@ -3,4 +3,8 @@ project(leedcode)
 
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(leedcode main.cpp)
+add_library(leetcodelib meeting/test.cpp meeting
+        /include/test.h)
+add_executable(leedcode main.cpp meeting/test.cpp)
+
+target_link_libraries(leedcode leetcodelib)

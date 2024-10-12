@@ -18,6 +18,21 @@ struct TreeNode {
          TreeNode(int x, TreeNode *left, TreeNode *right) : val(x), left(left), right(right) {}
 };
 
+class Node {
+public:
+    int val;
+    Node* left;
+    Node* right;
+    Node* next;
+
+    Node() : val(0), left(NULL), right(NULL), next(NULL) {}
+
+    Node(int _val) : val(_val), left(NULL), right(NULL), next(NULL) {}
+
+    Node(int _val, Node* _left, Node* _right, Node* _next)
+            : val(_val), left(_left), right(_right), next(_next) {}
+};
+
 class Tree {
 public:
 /* 104.二叉树的最大深度:
@@ -226,18 +241,147 @@ public:
         }
         return (p->val == root->val || q->val == root->val) || lflag || rflag;  //判断该节点和它的左右子树是否包含了q和p
     }
+
+/* 117. 填充每个节点的下一个右侧节点指针
+ * struct Node {
+  int val;
+  Node *left;
+  Node *right;
+  Node *next;
+}
+ 填充它的每个 next 指针，让这个指针指向其下一个右侧节点。如果找不到下一个右侧节点，则将 next 指针设置为 NULL 。初始状态下，所有 next 指针都被设置为 NULL 。
+ */
+    Node* connect(Node* root) {
+        /* 层次遍历*/
+        if(! root) return nullptr;
+        queue<Node*> q;
+        q.push(root);
+        while (!q.empty()){
+            int n = q.size();
+            Node* last = nullptr;
+            for (int i = 0; i < n; ++i) {
+                Node* f = q.front();
+                q.pop();
+                if(f->left) q.push(f->left);
+                if(f->right) q.push(f->right);
+                if (i != 0){
+                    last->next = f;
+                }
+                last = f;
+            }
+        }
+
+        return root;
+    }
+
+/* 199.二叉树的右视图
+ * 给定一个二叉树的 根节点 root，想象自己站在它的右侧，按照从顶部到底部的顺序，返回从右侧所能看到的节点值*/
+    vector<int> rightSideView(TreeNode* root) {
+        vector<int> ans;
+        if (!root) return ans;  // 处理 root 为 nullptr 的情况
+        queue<TreeNode*> q;
+        q.push(root);
+
+        while (!q.empty()){
+            int n = q.size();
+            for (int i = 0; i < n; ++i) {
+                TreeNode* node = q.front();
+                q.pop();
+                if (node->left) q.push(node->left);
+                if (node->right) q.push(node->right);
+                if( i == n - 1){
+                    ans.push_back(node->val);
+                }
+            }
+        }
+        return ans;
+    }
+
+/* 637. 二叉树的层平均值
+ * 给定一个非空二叉树的根节点 root , 以数组的形式返回每一层节点的平均值。与实际答案相差 10-5 以内的答案可以被接受。*/
+    vector<double> averageOfLevels(TreeNode* root) {
+        vector<double> ans;
+
+        if(!root) return ans;
+
+        queue<TreeNode*> q;
+        q.push(root);
+        while (!q.empty()){
+            int n = q.size();
+            int sum = 0;
+            for (int i = 0; i < n; ++i) {
+                TreeNode* node = q.front();
+                sum += node->val;
+                q.pop();
+                if (node->left) q.push(node->left);
+                if (node->right) q.push(node->right);
+            }
+            int ave = (float)(sum / n );
+            ans.push_back(ave);
+        }
+        return ans;
+    }
+
+
+/* 103. 二叉树的锯齿形层序遍历
+ * 给你二叉树的根节点 root ，返回其节点值的 锯齿形层序遍历 。（即先从左往右，再从右往左进行下一层遍历，以此类推，层与层之间交替进行）。 */
+    vector<vector<int>> zigzagLevelOrder(TreeNode* root) {
+        vector<vector<int>> ans;
+        if (! root) return ans;
+        int dep = 0;
+        queue<TreeNode*> q;
+        q.push(root);
+        while (! q.empty()){
+            int n = q.size();
+            ans.push_back(vector<int>());//每进入一层，初始化容器
+            for (int i = 0; i < n; ++i) {
+                TreeNode* node = q.front();
+                q.pop();
+                if(dep % 2 == 1){
+                    if (node->left) q.push(node->left);
+                    if (node->right) q.push(node->right);
+                } else{
+                    if (node->right) q.push(node->right);
+                    if (node->left) q.push(node->left);
+                }
+                ans[dep].push_back(node->val);
+            }
+            dep++;
+        }
+        return ans;
+    }
+
+
+/* 530. 二叉搜索树的最小绝对差
+ * 给你一个二叉搜索树的根节点 root ，返回 树中任意两不同节点值之间的最小差值 。差值是一个正数，其数值等于两值之差的绝对值*/
+    int getMinimumDifference(TreeNode* root) {
+        //二叉搜索树中序遍历得到的值序列是递增有序的
+        int ans = INT_MAX, pre = -1;
+
+    }
+    void dfs(TreeNode* root, int pre, int ans){
+        if (root == nullptr) return;
+        dfs(root->left, pre, ans);
+        if(pre == -1 ){
+            pre =
+        }
+    }
 };
 
 
 
-class treebuild{
+class treebuild {
 private:
     unordered_map<int, int> index;//哈希映射中的每个键值对，键表示一个元素（节点的值），值表示其在中序遍历中的出现位置
+    unordered_map<int, int> index2;
+    int post_idx;
 public:
 /* 前序和中序遍历构造二叉树
 * 给定两个整数数组 preorder 和 inorder ，其中 preorder 是二叉树的先序遍历， inorder 是同一棵树的中序遍历，请构造二叉树并返回其根节点。*/
-    TreeNode* myBuildTree(vector<int>& preorder, vector<int>& inorder, int preorder_left, int preorder_right, int inorder_left, int inorder_right){
-        if(preorder_left > preorder_right){
+    TreeNode *
+    myBuildTree(vector<int> &preorder, vector<int> &inorder, int preorder_left, int preorder_right, int inorder_left,
+                int inorder_right) {
+        if (preorder_left > preorder_right) {
             return nullptr;
         }
         //前序遍历第一个节点就是根节点
@@ -245,48 +389,150 @@ public:
         //在中序遍历中定位根节点  都是在遍历中的位置
         int inorder_root = index[preorder[preorder_root]];
         //建立起根节点
-        TreeNode* root = new TreeNode(preorder[preorder_root]);
+        TreeNode *root = new TreeNode(preorder[preorder_root]);
         //得到左子树中的根节点数目
         int size_left = inorder_root - inorder_left;
         //递归构造左子树
         // 先序遍历中「从 左边界+1 开始的 size_left_subtree」个元素就对应了中序遍历中「从 左边界 开始到 根节点定位-1」的元素
-        root->left = myBuildTree(preorder, inorder, preorder_left+1, preorder_left+size_left, inorder_left, inorder_root-1);
+        root->left = myBuildTree(preorder, inorder, preorder_left + 1, preorder_left + size_left, inorder_left,
+                                 inorder_root - 1);
         // 递归地构造右子树，并连接到根节点
         // 先序遍历中「从 左边界+1+左子树节点数目 开始到 右边界」的元素就对应了中序遍历中「从 根节点定位+1 到 右边界」的元素
-        root->right = myBuildTree(preorder, inorder, preorder_left+1+size_left, preorder_right, inorder_root+1, inorder_right);
+        root->right = myBuildTree(preorder, inorder, preorder_left + 1 + size_left, preorder_right, inorder_root + 1,
+                                  inorder_right);
         return root;
     }
 
-    TreeNode* buildTree(vector<int>& preorder, vector<int>& inorder) {
+    TreeNode *buildTree(vector<int> &preorder, vector<int> &inorder) {
         int n = preorder.size();
         //哈希映射中的每个键值对，键表示一个元素（节点的值），值表示其在中序遍历中的出现位置
-        for(int i=0; i< n; i++){
+        for (int i = 0; i < n; i++) {
             index[inorder[i]] = i;
         }
-        return myBuildTree(preorder, inorder, 0 , n-1, 0, n-1);
+        return myBuildTree(preorder, inorder, 0, n - 1, 0, n - 1);
     }
+}
 
-
-/* ERROR:从中序和后续遍历序列构造二叉树
+/* 从中序和后续遍历序列构造二叉树
  * 给定两个整数数组 inorder 和 postorder ，其中 inorder 是二叉树的中序遍历， postorder 是同一棵树的后序遍历，请你构造并返回这颗 二叉树 。*/
-    TreeNode* helper(int in_left, int in_right, vector<int>& inorder, vector<int>& postorder) {
-        if(in_left > in_right) {
+
+class treebuild2 {
+    int post_idx;
+    unordered_map<int, int> idx_map;
+public:
+    TreeNode* helper(int in_left, int in_right, vector<int>& inorder, vector<int>& postorder){
+        // 如果这里没有节点构造二叉树了，就结束
+        if (in_left > in_right) {
             return nullptr;
         }
-        int n = postorder.size()-1;
-        int val = postorder[n];
-        TreeNode* root = new TreeNode(val);
-        int inorderRoot ;
+
+        // 选择 post_idx 位置的元素作为当前子树根节点
+        int root_val = postorder[post_idx];
+        TreeNode* root = new TreeNode(root_val);
+
+        // 根据 root 所在位置分成左右两棵子树
+        int index = idx_map[root_val];
+
+        // 下标减一
+        post_idx--;
+        // 构造右子树
+        root->right = helper(index + 1, in_right, inorder, postorder);
+        // 构造左子树
+        root->left = helper(in_left, index - 1, inorder, postorder);
         return root;
     }
+    TreeNode* buildTree(vector<int>& inorder, vector<int>& postorder) {
+        // 从后序遍历的最后一个元素开始
+        post_idx = (int)postorder.size() - 1;
 
-    TreeNode* buildTree_2(vector<int>& inorder, vector<int>& postorder) {
-        int n = inorder.size();
-        unordered_map<int, int> map;
-        for (int i = 0; i < n; ++i) {
-            map[inorder[i]] = i;
+        // 建立（元素，下标）键值对的哈希表
+        int idx = 0;
+        for (auto& val : inorder) {
+            idx_map[val] = idx++;
         }
-        return helper(0, n-1, inorder, postorder);
+        return helper(0, (int)inorder.size() - 1, inorder, postorder);
+    }
+
+/* 530. 二叉搜索树的最小绝对值*/
+
+    void inorder(TreeNode* root, vector<int>& res){
+        if (!root){
+            return;
+        }
+        inorder(root->left, res);
+        res.push_back(root->val);
+        inorder(root->right, res);
+    }
+    int getMinimumDifference(TreeNode* root) {
+        int x = INT_MAX;
+        vector<int> arr;
+        inorder(root, arr);
+        for (int i = 1; i < arr.size(); ++i) {
+            if (arr[i] - arr[i-1] < x){
+                x = arr[i] - arr[i-1];
+            }
+        }
+        return x;
+    }
+
+
+
+/* 230.二叉搜索树中第k小的树*/
+
+    int kthSmallest(TreeNode* root, int k) {
+        vector<int> arr;
+        inorder(root, arr);
+        return arr[k-1];
+    }
+
+/* 98. 验证二叉搜索树*/
+    bool isValidBST(TreeNode* root) {
+        vector<int> arr;
+        inorder(root, arr);
+        for (int i = 1; i < arr.size(); ++i) {
+            if (arr[i-1] >= arr[i]) return false;
+        }
+        return true;
+    }
+};
+
+
+
+/* 173.二叉搜索树迭代器
+ * 实现一个二叉搜索树迭代器类BSTIterator ，表示一个按中序遍历二叉搜索树（BST）的迭代器：
+BSTIterator(TreeNode root) 初始化 BSTIterator 类的一个对象。BST 的根节点 root 会作为构造函数的一部分给出。指针应初始化为一个不存在于 BST 中的数字，且该数字小于 BST 中的任何元素。
+boolean hasNext() 如果向指针右侧遍历存在数字，则返回 true ；否则返回 false 。
+int next()将指针向右移动，然后返回指针处的数字。*/
+class BSTIterator {
+
+private:
+    int idx = 0;
+    vector<int> arr;
+    void inorder(TreeNode* root, vector<int>& res) {
+        if (!root) {
+            return;
+        }
+        inorder(root->left, res);
+        res.push_back(root->val);
+        inorder(root->right, res);
+    }
+    vector<int> inorderTraversal(TreeNode* root){
+        vector<int> res;
+        inorder(root, res);
+        return res;
+    }
+public:
+    BSTIterator(TreeNode* root) {
+        arr = inorderTraversal(root);
+        idx = 0;
+    }
+
+    int next() {
+        return arr[idx++];
+    }
+
+    bool hasNext() {
+        return (idx < arr.size());
     }
 };
 
