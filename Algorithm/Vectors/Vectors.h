@@ -101,8 +101,7 @@ class Vectors {
 
 
 
-/*合并有序数组
- * */
+/*合并有序数组*/
     void merge(vector<int>& nums1, int m, vector<int>& nums2, int n) {
         int p1 = 0, p2 = 0;
         int sorted[m + n];
@@ -151,7 +150,7 @@ class Vectors {
         int fast = 1, slow = 1;
         while (fast < n){
             if(nums[fast] != nums[fast-1]){
-                nums[slow] = nums[fast];
+                nums[slow] = nums[fast];//相当于往前压缩 00112 --> 012
                 slow++;
             }
             fast++;
@@ -209,7 +208,7 @@ class Vectors {
             //主要理解这一步
             ans[(i + k) % n] = nums[i];
         }
-        nums.assign(ans.begin(), ans.end());
+        nums.assign(ans.begin(), ans.end());//将ans向量中的所有元素复制到nums向量中
     }
 
     /* 买卖股票的最佳时机
@@ -234,21 +233,36 @@ class Vectors {
         int cost = INT_MAX;
         int profig = 0;
         for(int price : prices){
-            cost = min(cost, price);
-            profig = max(profig , price - cost);
+            cost = min(cost, price);//前i天 最低的价格
+            profig = max(profig , price - cost);//第i天的最高首页
         }
         return profig;
     }
 
-    /*买卖股票的最佳实际II
+    /*买卖股票的最佳实际II(相比较1 可以买卖多次)
      * 给你一个整数数组 prices ，其中 prices[i] 表示某支股票第 i 天的价格。
      * 在每一天，你可以决定是否购买和/或出售股票。你在任何时候最多只能持有一股股票。你也可以先购买，然后在同一天出售。返回能获得的最大利润 。*/
-    int maxProfit_3(vector<int>& prices) {
+        int maxProfit_3(vector<int>& prices) {
+            /*动态规划
+             * 定义状态 dp[i][0] 表示第 i 天交易完后手里没有股票的最大利润，dp[i][1] 表示第 i 天交易完后手里持有一支股票的最大利润（i 从 0 开始）
+             * dp[i][0]=max{dp[i−1][0],dp[i−1][1]+prices[i]}
+             * dp[i][1]=max{dp[i−1][1],dp[i−1][0]−prices[i]}
+    。*/
+            int n = prices.size();
+            vector<vector<int>> dp(n, vector<int>(2));
 
-    }
+            //初始条件:
+            dp[0][0] = 0;
+            dp[0][1] = -prices[0];
+            for (int i = 1; i < prices.size(); ++i) {
+                dp[i][0] = max(dp[i-1][0], dp[i -1][1] + prices[i]);
+                dp[i][1] = max(dp[i-1][1], dp[i -1][0] - prices[i]);
+            }
+            return dp[n-1][0];
+        }
 
 /* 跳跃游戏：给你一个非负整数数组nums，你最初位于数组的第一个下标 。数组中的每个元素代表你在该位置可以跳跃的最大长度。判断你是否能够到达最后一个下标，如果可以，返回 true否则，返回 false
- * 思路： 贪心算法只要存在一个位置 xxx，它本身可以到达，并且它跳跃的最大长度为x+nums[x]，这个值大于等于y，即 x+nums[x]≥y，那么位置 yyy 也可以到达。
+ * 思路： 贪心算法只要存在一个位置 xxx，它本身可以到达，并且x+nums[x]≥y，那么位置 yyy 也可以到达。
  * */
     bool canJump(vector<int>& nums) {
         int n = nums.size();
@@ -267,6 +281,8 @@ class Vectors {
 /* 跳跃游戏2：每个元素 nums[i] 表示从索引 i 向前跳转的最大长度。换句话说，如果你在 nums[i] 处，你可以跳转到任意 nums[i + j] 处:返回到达 nums[n - 1] 的最小跳跃次数。
  * 思路：可以考虑最后一步跳跃前所在的位置，该位置通过跳跃能够到达最后一个位置。我们可以「贪心」地选择距离最后一个位置最远的那个位置，也就是对应下标最小的那个位置。*/
     int jump(vector<int>& nums) {
+        //直观上来看，我们可以「贪心」地选择距离最后一个位置最远的那个位置，也就是对应下标最小的那个位置。因此，我们可以从左到右遍历数组，选择第一个满足要求的位置。
+        //找到最后一步跳跃前所在的位置之后，我们继续贪心地寻找倒数第二步跳跃前所在的位置，以此类推，直到找到数组的开始位置。
         int position = nums.size() - 1;
         int step = 0;
         while (position > 0){
@@ -274,6 +290,7 @@ class Vectors {
                 if(nums[i] + i >= position){
                     position = i;
                     step++;
+                    break;
                 }
             }
         }
@@ -281,7 +298,7 @@ class Vectors {
     }
 
 /* 274.H指数：给你一个整数数组 citations ，其中 citations[i] 表示研究者的第 i 篇论文被引用的次数。计算并返回该研究者的 h 指数。
- * 一名科研人员的h指数至少发表了h篇论文，并且每篇论文至少被引用h次。如果h有多种可能的值，h指数是其中最大的那个。[3,0,6,1,5]:有 3 篇论文每篇 至少 被引用了 3 次*/
+ * 一名科研人员的h指数:至少发表了h篇论文，并且每篇论文至少被引用h次。如果h有多种可能的值，h指数是其中最大的那个。[3,0,6,1,5]:有 3 篇论文每篇 至少 被引用了 3 次*/
     int hIndex(vector<int>& citations) {
 /*如果当前 H 指数为 h 并且在遍历过程中找到当前值 citations[i]>h，则说明我们找到了一篇被引用了至少 h+1 次的论文，所以将现有的 h 值加 1。继续遍历直到 h 无法继续增大。最后返回 h 作为最终答案。*/
         sort(citations.begin(), citations.end());
@@ -402,7 +419,8 @@ class Vectors {
         }
         return sum;
     }
-/* 思路2：按列求。考虑当前列、左边最高的墙，右边最高的墙就够了。装水的多少，当然根据木桶效应，我们只需要看左边最高的墙和右边最高的墙中较矮的一个就够了。*/
+/* 思路2：按列求。考虑当前列、左边最高的墙，右边最高的墙就够了。装水的多少，
+ * 当然根据木桶效应，我们只需要看左边最高的墙和右边最高的墙中较矮的一个就够了。*/
     int trap_2(vector<int>& height) {
         int n = height.size();
         vector<int> left(n,0);//left[i]表示第i列左边最高的墙
@@ -436,7 +454,7 @@ D             500
 M             1000
  当小值在大值的左边，则减小值，如 IV=5-1=4；当小值在大值的右边，则加小值，如 VI=5+1=6；*/
     int romanToInt(string s) {
-        unordered_map<char, int> map = {
+        unordered_map<char, int> map = { //记下这种用法
                 {'I',1},
                 {'V', 5},
                 {'X', 10},
@@ -483,7 +501,7 @@ C 可以放在 D (500) 和 M (1000) 的左边，来表示 400 和 900。
         };
         string res;
         int tmp = num;
-        for(const auto &[value,Roman] : valueSymbols){
+        for(const auto &[value,Roman] : valueSymbols){//遍历数组
             while (tmp >= value){
                 tmp -= value;
                 res = res + Roman;
@@ -564,6 +582,104 @@ C 可以放在 D (500) 和 M (1000) 的左边，来表示 400 和 900。
         ans = ans+ words.top();
         return ans;
     }
+
+/* 99. 最小路径和
+ * 给定一个包含非负整数的 m x n 网格 grid ，请找出一条从左上角到右下角的路径，使得路径上的数字总和为最小。说明：一个机器人每次只能向下或者向右移动一步。*/
+    int minPathSum(vector<vector<int>>& grid) {
+
+        /* 动态规划：dp[i][j] : 左上角到【i,j】的最短路径
+         * 状态转移方程：
+         * dp[i][j] = grid[i][j] + [min(dp[i-1][j], dp[i][j-1])
+         * 左/右侧：dp[i][j] = grid[i][j] + dp[i-1][j]
+         * 上/下侧：dp[i][j] = grid[i][j] + dp[i][j-1]*/
+        if (grid.size() == 0 || grid[0].size() == 0) {
+            return 0;
+        }
+        int m = grid.size();
+        int n = grid[0].size();
+        vector<vector<int>> dp(m, vector<int>(n));
+        dp[0][0] = grid[0][0];
+        for (int i = 1; i < m; ++i) {
+            dp[i][0] = dp[i -1][0] + grid[i][0];
+
+        }
+        for (int j = 1; j < n; ++j) {
+            dp[0][j] = dp[0][j-1] + grid[0][j];
+
+        }
+        for (int i = 1; i < m; ++i) {
+            for (int j = 1; j < n; ++j) {
+                dp[i][j] = grid[i][j]+min(dp[i-1][j], dp[i][j-1]);
+            }
+        }
+        return dp[m-1][n-1];
+    }
+
+
+/* 螺旋矩阵
+ * 给你一个 m 行 n 列的矩阵 matrix ，请按照 顺时针螺旋顺序 ，返回矩阵中的所有元素。
+ * 思考：
+需要按照螺旋的顺序来打印，即要依次打印：上边一行、右边一列、下边一行、左边一列
+主要是考虑边界问题；打印了上边一行后，打印右边一列必须得从下一个行的元素开始，不然会有重复元素；打印了右边一列之后，同理，需要从左边一列的元素开始，依次同理；
+另外要考虑重复问题：在 右到左 和 下到上 时必须加上判断 top!= bottom 、left!=right ，否则会多走
+ 方案：
+ 首先设定上下左右边界
+其次向右移动到最右，此时第一行因为已经使用过了，可以将其从图中删去，体现在代码中就是重新定义上边界
+判断若重新定义后，上下边界交错，表明螺旋矩阵遍历结束，跳出循环，返回答案
+若上下边界不交错，则遍历还未结束，接着向下向左向上移动，操作过程与第一，二步同理
+不断循环以上步骤，直到某两条边界交错，跳出循环，返回答案
+*/
+    vector<int> spiralOrder(vector<vector<int>>& matrix) {
+        vector<int> ans;
+        int m = matrix.size();
+        int n = matrix[0].size();
+        int u = 0, d = m-1, l = 0, r = n-1;//设置边界
+        while(true){
+            for(int i = l; i <= r; ++i) ans.push_back(matrix[u][i]); //向右移动直到最右
+            if(++ u > d) break; //重新设定上边界，若上边界大于下边界，则遍历遍历完成，下同  //注意 这里没有等号
+            for(int i = u; i <= d; ++i) ans.push_back(matrix[i][r]); //向下
+            if(-- r < l) break; //重新设定有边界
+            for(int i = r; i >= l; --i) ans.push_back(matrix[d][i]); //向左
+            if(-- d < u) break; //重新设定下边界
+            for(int i = d; i >= u; --i) ans.push_back(matrix[i][l]); //向上
+            if(++ l > r) break; //重新设定左边界
+
+        }
+        return ans;
+    }
+
+
+ /* 连续子数组的最大乘积
+  * 以dp[i] 表示以a[i]结尾的子数组的最大乘积
+    但是由于有负数的存在，会导致乘法结果反转，dp[i-1]*a[i]反而成了最小值
+    如果a[i]为负数，那么dp[i-1]越大，dp[i]就越小；dp[i-1]越小，dp[i]就越大
+    所以我们需要同时保存最大值和最小值 maxdp[i] 、mindp[i]
+    a[i] > 0时：
+    maxdp[i] = max(a[i], a[i]*maxdp[i-1])
+    mindp[i] = min(a[i], a[i]*mindp[i-1])
+    a[i] < 0时：
+    maxdp[i] = max(a[i], a[i]*mindp[i-1])
+    mindp[i] = min(a[i], a[i]*maxdp[i-1])
+    a[i]=0时，max和min肯定是0。
+  * */
+ double maxProduct(std::vector<double>& arr) {
+     if(arr.empty()) return 0;
+     std::vector<double> maxdp(arr.size());  //以arr[i]结尾的最大乘积
+     std::vector<double> mindp(arr.size());  //以arr[i]结尾的最小乘积
+     maxdp[0] = mindp[0] = arr[0];
+     double max_result = arr[0];
+     for(size_t i=1; i<arr.size(); i++){
+         if(arr[i]>0){
+             maxdp[i] = std::max(arr[i], maxdp[i-1]*arr[i]);
+             mindp[i] = std::min(arr[i], mindp[i-1]*arr[i]);
+         }else{
+             maxdp[i] = std::max(arr[i], mindp[i-1]*arr[i]);
+             mindp[i] = std::min(arr[i], maxdp[i-1]*arr[i]);
+         }
+         max_result = std::max(max_result, maxdp[i]);
+     }
+     return max_result;
+ }
 };
 
 

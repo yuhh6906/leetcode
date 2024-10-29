@@ -6,6 +6,7 @@
 #define C__GRAGH_H
 #include <string>
 #include <vector>
+#include <queue>
 #include <unordered_map>
 #include <climits>
 
@@ -60,16 +61,6 @@ public:
     }
 
 
-    void dfs_numIslands(vector<vector<char>>& grid, int r, int c) {
-        int nr = grid.size();
-        int nc = grid[0].size();
-
-        grid[r][c] = '0';
-        if (r - 1 >= 0 && grid[r-1][c] == '1') dfs_numIslands(grid, r - 1, c);
-        if (r + 1 < nr && grid[r+1][c] == '1') dfs_numIslands(grid, r + 1, c);
-        if (c - 1 >= 0 && grid[r][c-1] == '1') dfs_numIslands(grid, r, c - 1);
-        if (c + 1 < nc && grid[r][c+1] == '1') dfs_numIslands(grid, r, c + 1);
-    }
 /* 200.岛屿数量
  * 给你一个由 '1'（陆地）和 '0'（水）组成的的二维网格，请你计算网格中岛屿的数量。
  * 岛屿总是被水包围，并且每座岛屿只能由水平方向和/或竖直方向上相邻的陆地连接形成。此外，你可以假设该网格的四条边均被水包围。*/
@@ -89,6 +80,17 @@ public:
         }
         return num_islands;
     }
+    void dfs_numIslands(vector<vector<char>>& grid, int r, int c) {
+        int nr = grid.size();
+        int nc = grid[0].size();
+
+        grid[r][c] = '0';
+        if (r - 1 >= 0 && grid[r-1][c] == '1') dfs_numIslands(grid, r - 1, c);
+        if (r + 1 < nr && grid[r+1][c] == '1') dfs_numIslands(grid, r + 1, c);
+        if (c - 1 >= 0 && grid[r][c-1] == '1') dfs_numIslands(grid, r, c - 1);
+        if (c + 1 < nc && grid[r][c+1] == '1') dfs_numIslands(grid, r, c + 1);
+    }
+
 
 /* 130.被围绕的区域
  * 给你一个 m x n 的矩阵 board ，由若干字符 'X' 和 'O' ，找到所有被 'X' 围绕的区域，并将这些区域里所有的 'O' 用 'X' 填充。
@@ -158,11 +160,7 @@ public:
         return cloneNode;
     }
 
-/* */
 
-//    vector<double> calcEquation(vector<vector<string>>& equations, vector<double>& values, vector<vector<string>>& queries) {
-//
-//    }
 
 /* 207. 课程表
  * 你这个学期必须选修 numCourses 门课程，记为 0 到 numCourses - 1 。在选修某些课程之前需要一些先修课程。
@@ -246,7 +244,51 @@ public:
         }
     }
 
+/* 433. 最小基因变化
+ * 基因序列可以表示为一条由 8 个字符组成的字符串，其中每个字符都是 'A'、'C'、'G' 和 'T' 之一。
+ * 假设我们需要调查从基因序列 start 变为 end 所发生的基因变化。一次基因变化就意味着这个基因序列中的一个字符发生了变化。
+ * 例如，"AACCGGTT" --> "AACCGGTA" 就是一次基因变化。
+ * 另有一个基因库 bank 记录了所有有效的基因变化，只有基因库中的基因才是有效的基因序列。（变化后的基因必须位于基因库 bank 中）
+ * 给你两个基因序列 start 和 end ，以及一个基因库 bank ，请你找出并返回能够使 start 变化为 end 所需的最少变化次数。如果无法完成此基因变化，返回 -1 。
+ * 注意：起始基因序列 start 默认是有效的，但是它并不一定会出现在基因库中。*/
+    int minMutation(string startGene, string endGene, vector<string>& bank) {
+        /* 排除边界条件：start 或 end 空或 bank 为空或 end 不在 bank 中。
+         * bfs 的初始化工作：初始化步长，初始化 queue，将 start 入队列，用 visit 来标记已经访问过的点。
+         * 进行 bfs：先将步长+1，然后确定每次 bfs 的长度 size，寻找目标基因，然后入队出队等操作。
+         */
+        // 1：判断极端情况
+        if(start.empty()||end.empty()||bank.empty())return -1;
+        if(find(bank.begin(),bank.end(),end)==bank.end())return -1;// 目标基因不在基因库中
 
+        // 2：bfs的初始化工作
+        vector<int> visit(bank.size(),0);
+        int step=0;
+        queue<string> q;
+        q.push(start);
+
+        // 3：进行bfs
+        while(!q.empty()){
+            step++;
+            int n=q.size();// 确定每次bfs的宽度
+            for(int i=0;i<n;++i){
+                string temp=q.front();q.pop();// 这里获得队头元素不要用引用，至于具体原因可以参考评论区链接
+                for(int j=0;j<bank.size();++j){// 遍历整个基因库，访问未标记的基因；找到某个字符变异的基因添加标记，并进入队列即可
+                    if(visit[j]==0){
+                        int diff=0;
+                        for(int k=0;k<temp.size();++k){
+                            if(temp[k]!=bank[j][k])diff++;
+                        }
+                        if(diff==1){// 找到某个字符编译的基因
+                            if(bank[j]==end)return step;// 若该下标j代表的基因为目标基因，则直接返回步长
+                            visit[j]=1;// 标记下标为j的基因已访问
+                            q.push(bank[j]);
+                        }
+                    }
+                }
+            }
+        }
+        return -1;
+    }
 };
 
 

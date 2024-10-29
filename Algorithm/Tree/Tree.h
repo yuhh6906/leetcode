@@ -133,7 +133,7 @@ public:
     }
 
 /* 112.路径总和
- * 给你二叉树的根节点 root 和一个表示目标和的整数 targetSum 。判断该树中是否存在 根节点到叶子节点 的路径，这条路径上所有节点值相加等于目标和 targetSum 。
+ * 给你二叉树的根节点 root 和一个表示目标和的整数 targetSum 。判断该树中是否存在 根节点到叶子节点 的路径，这条路径上所有节点值相加等于目标和 targetSum
  * 如果存在，返回 true ；否则，返回 false 。叶子节点 是指没有子节点的节点。*/
     bool hasPathSum(TreeNode* root, int targetSum) {
         if(root == nullptr){
@@ -533,6 +533,112 @@ public:
 
     bool hasNext() {
         return (idx < arr.size());
+    }
+};
+
+/* 208. 实现Trie(字典树/前缀树)
+ * Trie() 初始化前缀树对象。
+ * void insert(String word) 向前缀树中插入字符串 word 。
+ * boolean search(String word) 如果字符串 word 在前缀树中，返回 true（即，在检索之前已经插入）；否则，返回 false 。
+ * boolean startsWith(String prefix) 如果之前已经插入的字符串 word 的前缀之一为 prefix ，返回 true ；否则，返回 false */
+class Trie {
+private:
+    bool isEnd;
+    Trie* next[26];
+public:
+    Trie() {
+        isEnd = false;
+        memset(next, 0, sizeof(next));
+    }
+
+    void insert(string word) {
+        Trie* node = this;
+        for(char c : word){
+            if(node->next[c-'a'] == nullptr){
+                node->next[c-'a'] = new Trie();
+            }
+            node = node->next[c-'a'];
+        }
+        node->isEnd = true;   //假设单词是三个字母 isEnd所在节点在第四层
+    }
+
+    bool search(string word) {
+        Trie* node = this;
+        for(char c : word){
+            if(node->next[c-'a'] == nullptr){
+                return false;
+            }
+            node = node->next[c-'a'];
+        }
+        return node->isEnd;
+    }
+
+    bool startsWith(string prefix) {
+        Trie* node = this;
+        for(char c : prefix){
+            if(node->next[c-'a'] == nullptr){
+                return false;
+            }
+            node = node->next[c-'a'];
+        }
+        return true;
+    }
+};
+
+
+/* 211. 添加与搜索单词- 数据结构设计
+ * 请你设计一个数据结构，支持 添加新单词 和 查找字符串是否与任何先前添加的字符串匹配 。实现词典类 WordDictionary ：
+ * WordDictionary() 初始化词典对象
+ * void addWord(word) 将 word 添加到数据结构中，之后可以对它进行匹配
+ * bool search(word) 如果数据结构中存在字符串与 word 匹配，则返回 true ；否则，返回  false 。word 中可能包含一些 '.' ，每个 . 都可以表示任何一个字母。*/
+struct TrieNode{
+    bool isEnd;
+    vector<TrieNode* > child;
+    TrieNode(){
+        this->isEnd = false;
+        this->child = vector<TrieNode* >(26, nullptr);
+    }
+};
+
+class WordDictionary {
+private:
+    TrieNode *trie;
+public:
+    WordDictionary() {
+        trie = new TrieNode();
+    }
+
+    void addWord(string word) {
+        TrieNode *node = trie;
+        for(char ch : word){
+            if(node->child[ch - 'a'] == nullptr) node->child[ch - 'a'] = new TrieNode();
+            node = node->child[ch - 'a'];
+        }
+        node->isEnd = true;
+    }
+
+    bool search(string word) {
+        return dfs(word, 0, trie);
+    }
+
+    bool dfs(string word, int index, TrieNode * node){//index表示第几个字母 node表示当前的结构体指针
+        if(index == word.size()) return node->isEnd;
+
+        char ch = word[index];
+        if(ch < 'z' && ch > 'a'){// 不是空指针
+            if(node->child[ch - 'a'] == nullptr) return false;
+            if(dfs(word, index+1, node->child[ch - 'a'])){
+                return true;
+            }
+        }else if(ch == '.'){
+            for (int i = 0; i < 26; ++i) {
+                if(node->child[i] != nullptr && dfs(word, index+1, node->child[i])){
+                    return true;
+                }
+            }
+        }
+        return false;
+
     }
 };
 
