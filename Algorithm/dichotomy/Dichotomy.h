@@ -8,41 +8,119 @@
 
 /* 二分法最重要的两个点:
  * while循环中 left 和 right 的关系，到底是 left <= right 还是 left < right
- * 迭代过程中 middle 和 right 的关系，到底是 right = middle - 1 还是 right = middle\
+ * 迭代过程中 middle 和 right 的关系，到底是 right = middle - 1 还是 right = middle
  * while(left <= right) 左闭又闭 while(left < right) 左开右闭 return left
  * */
-class Dichotomy {
-/* 35. 搜索插入位置
- * 给定一个排序数组和一个目标值，在数组中找到目标值，并返回其索引。如果目标值不存在于数组中，返回它将会被按顺序插入的位置。请必须使用时间复杂度为 O(log n) 的算法。*/
-    int searchInsert(vector<int>& nums, int target) {
-        int n = nums.size();
-//        if(n < 1) return n;
-        int left = 0;
-        int right = n - 1;
-        int ans = n;
-        //nums[pos-1] < target <= nums[pos];返回pos
-        while (left <= right){
-            int mid = ((right - left) >> 1) + left;
-            if(target <= nums[mid]){
-                ans = mid;
+
+
+class Template{
+
+public:
+    //朴素二分查找
+    int binary_search(vector<int>& nums, int target) {
+        int left = 0, right = nums.length - 1;
+        while(left <= right) {
+            int mid = left + (right - left) / 2;
+            if (nums[mid] < target) {
+                left = mid + 1;
+            } else if (nums[mid] > target) {
                 right = mid - 1;
-            } else{
+            } else if(nums[mid] == target) {
+                // 直接返回
+                return mid;
+            }
+        }
+        // 直接返回
+        return -1;
+    }
+
+    //左端点查找
+    int left_bound(vector<int>& nums, int target) {
+        int left = 0, right = nums.length - 1;
+        //right = nums.length - 1 --> left <= right
+        //right = nums.length     --> left < right
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            if (nums[mid] < target) {
+                left = mid + 1;
+            } else if (nums[mid] > target) {
+                right = mid - 1;
+            } else if (nums[mid] == target) {
+                // 别返回，锁定左侧边界
+                right = mid - 1;
+            }
+        }
+        // 最后要检查 left 越界的情况
+        if (left >= nums.length || nums[left] != target)
+            return -1;
+        return left;
+    }
+
+
+    int right_bound(vector<int>& nums, int target) {
+        int left = 0, right = nums.length - 1;
+        while (left <= right) {
+            int mid = left + (right - left) / 2;
+            if (nums[mid] < target) {
+                left = mid + 1;
+            } else if (nums[mid] > target) {
+                right = mid - 1;
+            } else if (nums[mid] == target) {
+                // 别返回，锁定右侧边界
                 left = mid + 1;
             }
         }
-        return ans;
+        // 最后要检查 right 越界的情况
+        if (right < 0 || nums[right] != target)
+            return -1;
+        return right;
+    }
+
+};
+
+class Dichotomy {
+public:
+/* 35. 搜索插入位置
+ * 给定一个排序数组和一个目标值，在数组中找到目标值，并返回其索引。如果目标值不存在于数组中，返回它将会被按顺序插入的位置。请必须使用时间复杂度为 O(log n) 的算法。*/
+    int searchInsert(vector<int>& nums, int target) {
+//        int n = nums.size();
+////        if(n < 1) return n;
+//        int left = 0;
+//        int right = n - 1;
+//        int ans = n;
+//        //nums[pos-1] < target <= nums[pos];返回pos
+//        while (left <= right){
+//            int mid = ((right - left) >> 1) + left;
+//            if(target <= nums[mid]){
+//                ans = mid;
+//                right = mid - 1;
+//            } else{
+//                left = mid + 1;
+//            }
+//        }
+//        return ans;
 
         //解法2
         int n = nums.size();
-        int l=0,r=n-1;
-        while(l<=r){
-            int mid=l+(r-l)/2;
-            if(nums[mid]<target)
-                l=mid+1;
-            else r=mid-1;
+        int left = 0;
+        int right = n - 1;
+        while(left <= right){
+            int mid = left + ((right - left) >> 1);
+            if(nums[mid] > target){
+                right = mid - 1;
+            }else if(nums[mid] < target){
+                left = mid + 1;
+            }else{
+                //收敛右边界
+                right = mid - 1;
+            }
         }
-        return l;
+        //因为目标值不存在于数组中，返回它将会被按顺序插入的位置，不用考虑越界的事情
+        return left;
     }
+
+
+
 /* 74. 搜素二维矩阵
  * 给你一个满足下述两条属性的 m x n 整数矩阵：每行中的整数从左到右按非严格递增顺序排列。每行的第一个整数大于前一行的最后一个整数。
  * 给你一个整数 target ，如果 target 在矩阵中，返回 true ；否则，返回 false 。*/
@@ -130,12 +208,37 @@ class Dichotomy {
  * 你必须设计并实现时间复杂度为 O(log n) 的算法解决此问题。*/
     vector<int> searchRange(vector<int>& nums, int target) {
         int left = 0,right = nums.size() - 1;
+        vector<int> ans = {-1, -1};
         while (left <= right){
             int mid = ((right - left) >> 1) + left;
-            if(nums[mid] > left){
-
+            if(nums[mid] >= target){
+                right = mid - 1;
+            }else if(nums[mid] < target){
+                left = mid + 1;
             }
         }
+        if(left >= nums.size() || nums[left] != target) {
+            return ans;
+        }else{
+            ans[0] = left;
+        }
+        left = 0;
+        right = nums.size() - 1;
+        while (left <= right){
+            int mid = ((right - left) >> 1) + left;
+            if(nums[mid] > target){
+                right = mid - 1;
+            }else if(nums[mid] <= target){
+                left = mid + 1;
+            }
+        }
+        if(right < 0 || nums[right] != target){
+            return vector<int>{-1, -1};
+        }else{
+            ans[1] = right;
+        }
+        return ans;
+
     }
 
 
@@ -190,6 +293,26 @@ class Dichotomy {
                 index2 = newIndex2 + 1;
             }
         }
+    }
+
+
+/* 153. 寻找旋转排序数组中的最小值
+ * 已知一个长度为 n 的数组，预先按照升序排列，经由 1 到 n 次 旋转 后，得到输入数组。例如，原数组 nums = [0,1,2,4,5,6,7] 在变化后可能得到：若旋转 4 次，则可以得到 [4,5,6,7,0,1,2]
+ * 注意，数组 [a[0], a[1], a[2], ..., a[n-1]] 旋转一次 的结果为数组 [a[n-1], a[0], a[1], a[2], ..., a[n-2]] 。
+ * 给你一个元素值 互不相同 的数组 nums ，它原来是一个升序排列的数组，并按上述情形进行了多次旋转。请你找出并返回数组中的 最小元素 。你必须设计一个时间复杂度为 O(log n) 的算法解决此问题。*/
+    int findMin(vector<int>& nums) {
+        int left = 0, right = nums.size() - 1;
+        while(left < right){
+            int mid = ((right - left) >> 1) + left;
+            if(nums[mid] < nums[right]){
+                //说明右半部分是升序 最小值不在右半部分 丢弃右半部分
+                right = mid;
+            }else{//不存在相等的情况
+                //说明左半部分是升序 最小值不在左半部分 丢弃左半部分
+                left = mid + 1; //注意是+1 不是直接等于
+            }
+        }
+        return nums[left];
     }
 };
 

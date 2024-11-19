@@ -223,7 +223,7 @@ class Maths{
         return ans;
     }
 
-/* 50. 实现 pow(x, n) ，即计算 x 的整数 n 次幂函数（即，xn ）。
+/* 50. 实现 pow(x, n) ，即计算 x 的整数 n 次幂函数（即，xn ）。 字节面试题
  * 方法1：递归
  * 方法2：迭代*/
 
@@ -240,6 +240,25 @@ class Maths{
         } else {
             return half * half * x;
         }
+    }
+
+    /*迭代方法的核心思想是利用指数的二进制表示，通过不断平方基数并根据指数的二进制位进行乘法操作，从而达到快速计算的目的。*/
+    double power(double x, int y) {
+        double res = 1;
+        long long exponent = y;//指数 注意是longlong
+        if(exponent < 0){//负指数的情况下，统一处理
+            exponent = -exponent;
+            x = 1/x;
+        }
+        while(exponent > 0){
+            if(exponent % 2 == 1){
+                res *= x;
+            }
+            x = x * x;  // 迭代情况: 每次迭代
+            exponent /= 2;
+        }
+        return res;
+
     }
 };
 

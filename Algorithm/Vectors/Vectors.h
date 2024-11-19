@@ -648,8 +648,7 @@ C 可以放在 D (500) 和 M (1000) 的左边，来表示 400 和 900。
         return ans;
     }
 
-
- /* 连续子数组的最大乘积
+/* 连续子数组的最大乘积
   * 以dp[i] 表示以a[i]结尾的子数组的最大乘积
     但是由于有负数的存在，会导致乘法结果反转，dp[i-1]*a[i]反而成了最小值
     如果a[i]为负数，那么dp[i-1]越大，dp[i]就越小；dp[i-1]越小，dp[i]就越大
@@ -662,24 +661,32 @@ C 可以放在 D (500) 和 M (1000) 的左边，来表示 400 和 900。
     mindp[i] = min(a[i], a[i]*maxdp[i-1])
     a[i]=0时，max和min肯定是0。
   * */
- double maxProduct(std::vector<double>& arr) {
-     if(arr.empty()) return 0;
-     std::vector<double> maxdp(arr.size());  //以arr[i]结尾的最大乘积
-     std::vector<double> mindp(arr.size());  //以arr[i]结尾的最小乘积
-     maxdp[0] = mindp[0] = arr[0];
-     double max_result = arr[0];
-     for(size_t i=1; i<arr.size(); i++){
-         if(arr[i]>0){
-             maxdp[i] = std::max(arr[i], maxdp[i-1]*arr[i]);
-             mindp[i] = std::min(arr[i], mindp[i-1]*arr[i]);
-         }else{
-             maxdp[i] = std::max(arr[i], mindp[i-1]*arr[i]);
-             mindp[i] = std::min(arr[i], maxdp[i-1]*arr[i]);
+    double maxProduct(std::vector<double>& arr) {
+         if(arr.empty()) return 0;
+         std::vector<double> maxdp(arr.size());  //以arr[i]结尾的最大乘积
+         std::vector<double> mindp(arr.size());  //以arr[i]结尾的最小乘积
+         maxdp[0] = mindp[0] = arr[0];
+         double max_result = arr[0];
+         for(size_t i=1; i<arr.size(); i++){
+             if(arr[i]>0){
+                 maxdp[i] = std::max(arr[i], maxdp[i-1]*arr[i]);
+                 mindp[i] = std::min(arr[i], mindp[i-1]*arr[i]);
+             }else{
+                 maxdp[i] = std::max(arr[i], mindp[i-1]*arr[i]);
+                 mindp[i] = std::min(arr[i], maxdp[i-1]*arr[i]);
+             }
+             max_result = std::max(max_result, maxdp[i]);
          }
-         max_result = std::max(max_result, maxdp[i]);
-     }
-     return max_result;
- }
+         return max_result;
+    }
+
+/* 4. 左右文本对齐  ：  给定一个单词数组 words 和一个长度 maxWidth ，重新排版单词，使其成为每行恰好有 maxWidth 个字符，且左右两端对齐的文本。
+ * 你应该使用 “贪心算法” 来放置给定的单词；也就是说，尽可能多地往每行中放置单词。必要时可用空格 ' ' 填充，使得每行恰好有 maxWidth 个字符。
+ * 要求尽可能均匀分配单词间的空格数量。如果某一行单词间的空格不能均匀分配，则左侧放置的空格数要多于右侧的空格数。
+ * 文本的最后一行应为左对齐，且单词之间不插入额外的空格*/
+    vector<string> fullJustify(vector<string>& words, int maxWidth) {
+
+    }
 };
 
 

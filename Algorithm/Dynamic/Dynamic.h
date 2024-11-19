@@ -360,10 +360,52 @@ class Multidimensional {
         }
         return s.substr(begin, max);
     }
+
+
 /* 72. 编辑距离
  * 给你两个单词 word1 和 word2， 请返回将 word1 转换成 word2 所使用的最少操作数 你可以对一个单词进行如下三种操作：
- * 插入一个字符、删除一个字符、替换一个字符*/
+ * 插入一个字符、删除一个字符、替换一个字符
+ * 输入：word1 = "horse", word2 = "ros"    输出：3
+ * horse -> rorse (将 'h' 替换为 'r')
+ * rorse -> rose (删除 'r')
+ * rose -> ros (删除 'e')*/
     int minDistance(string word1, string word2) {
+        /* 本质不同的操作实际上只有三种：
+         * 在单词 A 中插入一个字符；
+         * 在单词 B 中插入一个字符；
+         * 修改单词 A 的一个字符。
+         * 我们用 D[i][j] 表示 A 的前 i 个字母和 B 的前 j 个字母之间的编辑距离。
+         * 那么我们可以写出如下的状态转移方程：若 A 和 B 的最后一个字母相同：
+         * D[i][j]=min(D[i][j−1]+1,D[i−1][j]+1,D[i−1][j−1])=1+min(D[i][j−1],D[i−1][j],D[i−1][j−1]−1)
+         * 若 A 和 B 的最后一个字母不同：
+         * D[i][j]=1+min(D[i][j−1],D[i−1][j],D[i−1][j−1])
+*/
+        int m = word1.size();
+        int n = word2.size();
+        // 有一个字符串为空串
+        if (n * m == 0) return n + m;
+        // DP 数组  表示 A 的前 i 个字母和 B 的前 j 个字母之间的编辑距离。
+        vector<vector<int>> dp(m + 1, vector<int>(n + 1));
+        //编辑边界
+        for (int i = 0; i <= m; ++i) {
+            dp[i][0] = i;//A的前i个字母和B的前0个字母编辑距离，即i
+        }
+        for (int j = 0; j <= n; ++j) {
+            dp[0][j] = j;//B的前j个字母和A的前0个字母编辑距离，即j
+        }
+        //动态规划 计算所有dp
+        for (int i = 1; i <= m ; ++i) {
+            for (int j = 1; j <= n ; ++j) {
+                if(word1[i-1] == word2[j-1]){//为啥是i-1呢 ：需要减去1才能正确地访问字符串中的字符
+                    //对于 B 的第 j 个字符，我们修改 A 的第 i 个字符使它们相同，那么 D[i][j] 最小可以为 D[i-1][j-1] + 1。
+                    // 特别地，如果 A 的第 i 个字符和 B 的第 j 个字符原本就相同，那么我们实际上不需要进行修改操作。在这种情况下，D[i][j] 最小可以为 D[i-1][j-1]。
+                    dp[i][j] = min(dp[i-1][j] + 1, min(dp[i][j-1] + 1, dp[i-1][j-1]));
+                }else{
+                    dp[i][j] = min(dp[i-1][j] + 1, min(dp[i][j-1] + 1, dp[i-1][j-1] + 1));
+                }
+            }
+        }
+        return dp[m][n];
 
     }
 

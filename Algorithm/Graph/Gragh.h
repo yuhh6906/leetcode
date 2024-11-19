@@ -289,6 +289,56 @@ public:
         }
         return -1;
     }
+
+
+
+/* 399. 除法求值
+ * 给你一个变量对数组 equations 和一个实数值数组 values 作为已知条件，其中 equations[i] = [Ai, Bi] 和 values[i] 共同表示等式 Ai / Bi = values[i] 。每个 Ai 或 Bi 是一个表示单个变量的字符串。
+ * 另有一些以数组 queries 表示的问题，其中 queries[j] = [Cj, Dj] 表示第 j 个问题，请你根据已知条件找出 Cj / Dj = ? 的结果作为答案。
+ * 返回 所有问题的答案 。如果存在某个无法确定的答案，则用 -1.0 替代这个答案。如果问题中出现了给定的已知条件中没有出现的字符串，也需要用 -1.0 替代这个答案。
+ * 注意：输入总是有效的。你可以假设除法运算中不会出现除数为 0 的情况，且不存在任何矛盾的结果。
+ * 注意：未在等式列表中出现的变量是未定义的，因此无法确定它们的答案。*/
+    vector<double> calcEquation(vector<vector<string>>& equations, vector<double>& values, vector<vector<string>>& queries) {
+        //1. 构建有向图 2. 广度优先搜索
+        int n = equations.size();
+        // 第 1 步：预处理，将变量的值与 id 进行映射[string,string]-->value
+        unordered_map<string, unordered_map<string, double>> graph;  //类似与二维数组 不过坐标是string
+        for (int i = 0; i < n; ++i) {
+            string u = equations[i][0];
+            string v = equations[i][1];
+            double value = values[i];
+            graph[u][v] = value;
+            graph[v][u] = 1.0/value;
+        }
+        int m = queries.size();
+        vector<double> ans(m, -1.0);
+        for (int i = 0; i < m; ++i) {  //逐个找答案
+            string start = queries[i][0];
+            string target = queries[i][1];
+            if(!graph.count(start) || !graph.count[target]){
+                continue;//变量不存在 返回-1
+            }
+            if(start == target) {
+                ans[i] = 1.0;
+                continue;
+            }
+
+            //广度优先搜索
+            queue<unordered_map<string, double>> q;
+            q.push({start, -1.0});
+            while(!q.empty()){
+                auto pair = q.pop();
+                string curr = pair.first;
+                double currVal = pair.second;
+                if(curr == start){
+                    ans[i] = currVal;
+                    break;
+                }
+
+                for(auto& )
+            }
+        }
+    }
 };
 
 
