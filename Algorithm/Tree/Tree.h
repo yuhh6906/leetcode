@@ -5,9 +5,17 @@
 #include <algorithm>
 #include <queue>
 #include <unordered_map>
+#include <string>
+#include <cstring>
+#include <iostream>
 #ifndef C_TREE_H
 #define C_TREE_H
 using namespace std;
+/*
+ * - 搜索二叉树的所有根结点值大于左子结点值，小于右子节点值，通过中序遍历得到的是一个有序的序列，所以通过中序遍历后的序列是否有序来判断是否是搜索二叉树
+ * - 完全二叉树的定义是，其叶子结点在最后一行或者最后第二行，且结点是从左边连续的；所以可以通过层序遍历，一直到第一个空节点，如果是完全二叉树，那么第一个空节点后面的结点也是空节点。
+ * - 完全二叉树 的定义如下：除了最底层节点可能没填满外，其余每层节点数都达到最大值，并且最下面一层的节点都集中在该层最左边的若干位置。*/
+
 
 struct TreeNode {
          int val;
@@ -99,7 +107,7 @@ public:
         /*我们可以实现这样一个递归函数，通过「同步移动」两个指针的方法来遍历这棵树，p 指针和 q 指针一开始都指向这棵树的根，随后 p 右移时，q 左移，p 左移时，q 右移。
          * 每次检查当前 p 和 q 节点的值是否相等，如果相等再判断左右子树是否对称*/
 
-        return check(root, root);
+        return check(root->left, root->left);
     }
 
     bool check(TreeNode* p, TreeNode* q){
@@ -223,6 +231,9 @@ public:
 
 /* 二叉树的最近公共祖先
  * 给定一个二叉树, 找到该树中两个指定节点的最近公共祖先
+ * 最近公共祖先的定义为：“对于有根树 T 的两个节点 p、q，最近公共祖先表示为一个节点 x，满足 x 是 p、q 的祖先且 x 的深度尽可能大（一个节点也可以是它自己的祖先）。”
+ * 祖先的定义： 若节点 p 在节点 root 的左（右）子树中，或 p=root ，则称 root 是 p 的祖先。
+ * 最近公共祖先的定义： 设节点 root 为节点 p,q 的某公共祖先，若其左子节点 root.left 和右子节点 root.right 都不是 p,q 的公共祖先，则称 root 是 “最近的公共祖先” 。
  * 思路：符合条件的最近公共节点需要满足：
  * 1、左右子树分别包含p q;
  * 2、p、q正好是另一个的祖先节点，即p、q正好是最近公共节点*/
@@ -259,12 +270,12 @@ public:
         while (!q.empty()){
             int n = q.size();
             Node* last = nullptr;
-            for (int i = 0; i < n; ++i) {
+            for (int i = 1; i <= n; ++i) {
                 Node* f = q.front();
                 q.pop();
                 if(f->left) q.push(f->left);
                 if(f->right) q.push(f->right);
-                if (i != 0){
+                if (i != 1){
                     last->next = f;
                 }
                 last = f;
@@ -351,21 +362,6 @@ public:
         return ans;
     }
 
-
-/* 530. 二叉搜索树的最小绝对差
- * 给你一个二叉搜索树的根节点 root ，返回 树中任意两不同节点值之间的最小差值 。差值是一个正数，其数值等于两值之差的绝对值*/
-    int getMinimumDifference(TreeNode* root) {
-        //二叉搜索树中序遍历得到的值序列是递增有序的
-        int ans = INT_MAX, pre = -1;
-
-    }
-    void dfs(TreeNode* root, int pre, int ans){
-        if (root == nullptr) return;
-        dfs(root->left, pre, ans);
-        if(pre == -1 ){
-            pre =
-        }
-    }
 };
 
 
@@ -411,7 +407,7 @@ public:
         }
         return myBuildTree(preorder, inorder, 0, n - 1, 0, n - 1);
     }
-}
+};
 
 /* 从中序和后续遍历序列构造二叉树
  * 给定两个整数数组 inorder 和 postorder ，其中 inorder 是二叉树的中序遍历， postorder 是同一棵树的后序遍历，请你构造并返回这颗 二叉树 。*/
@@ -478,7 +474,6 @@ public:
 
 
 /* 230.二叉搜索树中第k小的树*/
-
     int kthSmallest(TreeNode* root, int k) {
         vector<int> arr;
         inorder(root, arr);

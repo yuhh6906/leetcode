@@ -52,7 +52,7 @@ public:
             }
             tail = tail->next;
         }
-        ListNode* pivot = 
+//        ListNode* pivot =
     }
 
 };

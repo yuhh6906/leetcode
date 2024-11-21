@@ -12,7 +12,6 @@ add_library(leetcodelib meeting/test.cpp meeting
 add_executable(leedcode main.cpp meeting/test.cpp
         Algorithm/Huisu/Lookback.cpp
         Algorithm/Huisu/Lookback.h
-        Algorithm/Stack/heap.cpp
         Algorithm/Maths/sort.cpp
         Algorithm/sort.cpp
         main.cpp

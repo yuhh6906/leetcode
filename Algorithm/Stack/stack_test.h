@@ -9,10 +9,17 @@
 #include <string>
 #include <unordered_map>
 #include <vector>
+#include <algorithm>
 
 using namespace std;
 
-/*最小栈*/
+/*155. 最小栈
+ * 设计一个支持 push ，pop ，top 操作，并能在常数时间内检索到最小元素的栈。实现 MinStack 类:
+ * MinStack() 初始化堆栈对象。
+ * void push(int val) 将元素val推入堆栈。
+ * void pop() 删除堆栈顶部的元素。
+ * int top() 获取堆栈顶部的元素。
+ * int getMin() 获取堆栈中的最小元素。*/
 class MinStack {
     stack<int> x_stack;
     stack<int> min_stack;
@@ -80,9 +87,15 @@ public:
         return res;
     }
 
-    /*逆波兰表达式求值
-     * 给你一个字符串数组 tokens ，表示一个根据 逆波兰表示法 表示的算术表达式。请你计算该表达式。返回一个表示表达式值的整数。
-     * 有效的算符为 '+'、'-'、'*' 和 '/'*/
+/* 150. 逆波兰表达式求值
+ * 给你一个字符串数组 tokens ，表示一个根据 逆波兰表示法 表示的算术表达式。请你计算该表达式。返回一个表示表达式值的整数。
+ * 有效的算符为 '+'、'-'、'*' 和 '/'
+ * 有效的算符为 '+'、'-'、'*' 和 '/'
+ * 每个操作数（运算对象）都可以是一个整数或者另一个表达式。
+ * 两个整数之间的除法总是 向零截断 。
+ * 表达式中不含除零运算。
+ * 输入是一个根据逆波兰表示法表示的算术表达式。
+ * 答案及所有中间计算结果可以用 32 位 整数表示。*/
     int evalRPN(vector<string>& tokens) {
         stack<int> stk;
         for (int i = 0; i < tokens.size(); ++i) {
@@ -186,5 +199,35 @@ public:
     }
 };
 
+class Heap{
+/* 215. 数组中的第K 个最大元素
+ * 给定整数数组 nums 和整数 k，请返回数组中第 k 个最大的元素。请注意，你需要找的是数组排序后的第 k 个最大的元素，而不是第 k 个不同的元素。
+ * 你必须设计并实现时间复杂度为 O(n) 的算法解决此问题。*/
+public:
+    int findKthLargest(vector<int>& nums, int k) {
+        sort(nums.begin(), nums.end());
+        int n = nums.size();
+        return nums[n - k ];
+    }
 
+
+
+/* 373. ERROR:查找和最小的K对数字： 给定两个以 非递减顺序排列 的整数数组 nums1 和 nums2 , 以及一个整数 k 。
+ * 定义一对值 (u,v)，其中第一个元素来自 nums1，第二个元素来自 nums2 。请找到和最小的 k 个数对 (u1,v1),  (u2,v2)  ...  (uk,vk) 。*/
+    vector<vector<int>> kSmallestPairs(vector<int>& nums1, vector<int>& nums2, int k) {
+        int m = nums1.size();
+        int n = nums2.size();
+        sort(nums1.begin(), nums1.end());
+        sort(nums2.begin(), nums2.end());
+        vector<vector<int>> ans;
+        for (int i = 0, j = 0; i < m && j < n; ) {
+            vector<int> vec = {nums1[i], nums2[j]};
+            ans.push_back(vec);
+            if(--k <= 0) return ans;
+            if(i+1 < m && j+1 < n && nums1[i+1] < nums2[j+1]) i++;
+            if(i+1 < m && j+1 < n && nums1[i+1] > nums2[j+1]) j++;
+        }
+        return ans;
+    }
+};
 #endif //TEST_C___STACK_TEST_H
